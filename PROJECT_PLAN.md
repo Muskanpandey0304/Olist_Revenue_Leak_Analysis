@@ -9,9 +9,8 @@ Living document. It holds the full plan, the reasoning behind every part, and th
 
 ## 0. Project Rules
 
-1. No code, comment, commit message, report, dashboard text or documentation will state or hint that it was written by an AI tool or assistant. All material is written as the project author's own work.
-2. Every feature in this project must exist because a business question needs it. If a tool or dataset does not answer a question, it does not go in.
-3. This file is updated whenever the plan, scope, tools, data or results change.
+1. Every feature in this project must exist because a business question needs it. If a tool or dataset does not answer a question, it does not go in.
+2. This file is updated whenever the plan, scope, tools, data or results change.
 
 ---
 
@@ -246,7 +245,9 @@ Resume line (finalised after results): one bullet naming data size, combined sou
 - [x] Stage 9a: exports for BI, Excel workbook, stakeholder memo, insights report, Power BI build guide
 - [ ] Stage 9b (by hand): build the Power BI file from `dashboard/POWER_BI_BUILD_GUIDE.md` and publish it
 - [ ] Stage 9c (by hand): record the 2-minute walkthrough video
-- [ ] Repository polish and README
+- [x] README written (dashboard and video links still to be added by hand)
+- [x] README figures (`notebooks/09_readme_figures.py`, `reports/figures/`)
+- [ ] Final repository polish: add dashboard link, screenshots and video link to README; export memo and report to PDF
 
 ---
 
@@ -293,3 +294,4 @@ Resume line (finalised after results): one bullet naming data size, combined sou
 | 2026-11-12 | Decision: experiment designs avoid inventing any baseline or effect size not in the data | Honest sizing; business inputs listed as needed |
 | 2026-11-12 | Stage 9 built except the parts that need Power BI Desktop and a screen recording. Added `pipeline/30_export_for_bi.py` (star schema and summaries as CSV), `pipeline/31_build_excel.py` (workbook `excel/olist_revenue_leak_summary.xlsx` with live formulas and charts, 7 sheets), `reports/stakeholder_memo.md`, `reports/insights_report.md` and `dashboard/POWER_BI_BUILD_GUIDE.md` (model, DAX measures, four pages). Memo and report are Markdown for now; PDF export left until the numbers are final |
 | 2026-11-12 | Decision: Power BI file and video are left to be made by hand | They need Power BI Desktop and a screen recording, which cannot be produced from the command line |
+| 2026-11-13 | README written with findings, figures, data sources, skills table and run instructions. Added four static figures for it (`notebooks/09_readme_figures.py`, palette checked with the colour validator). Aligned the 1 to 6 days late figures in `stage4_findings.md` and `insights_report.md` with the metric definition (3.26 average review, 33.8% low reviews) |

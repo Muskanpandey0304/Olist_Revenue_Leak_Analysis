@@ -14,7 +14,7 @@ Late delivery strongly damages review scores, but there is **no evidence that it
 
 - Mean difference: **-1.73 stars**, 95% bootstrap confidence interval [-1.77, -1.69].
 - Test: Mann-Whitney U, chosen because review scores are strongly skewed (59% are 5 stars). p-value below 1e-300 (reported as 0 by the software); effect size Cliff's delta = -0.55 (a large effect).
-- **How late matters.** Orders up to 6 days late score 3.15 on average (36.8% low reviews). From 7 days late the score collapses to about 1.7 (78% low reviews). Orders on or before the estimated date score 4.1 to 4.3. The estimated date is a promise; breaking it by a week is the cliff.
+- **How late matters.** Orders 1 to 6 days late score 3.26 on average (33.8% low reviews). From 7 days late the score collapses to about 1.7 (78% low reviews). Orders on or before the estimated date score 4.1 to 4.3. The estimated date is a promise; breaking it by a week is the cliff.
 
 ## 2. Repeat purchase (no detectable effect)
 Customers whose first order was in time to be observed for 90 days (75,306 customers):

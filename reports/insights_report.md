@@ -21,7 +21,7 @@ Monthly revenue rose from R$112k (January 2017) to R$988k (November 2017). From 
 - Scenario: each extra percentage point of customers who place one more order is worth about R$114,500 (0.9% of window revenue); raising the repeat rate from 3% to 10% would be worth about R$0.8M if each placed one average second order.
 
 ## 3. Is late delivery hurting us? (Stage 4)
-Late orders: mean review 2.57, 54.1% low reviews; on-time orders: 4.29, 9.2% (difference -1.73 stars, 95% confidence interval -1.77 to -1.69; Mann-Whitney test, effect size -0.55). Up to 6 days late: 3.15 and 36.8% low reviews; 7 or more days late: about 1.7 and 78% low reviews. Repeat purchase within 90 days: 2.03% after a late first order and 2.31% after an on-time one (difference -0.28 points, confidence interval -0.64 to +0.08, p = 0.148). The effect on repeat purchase, if any, is small. R$1.16M (8.8%) of window revenue sits on late orders.
+Late orders: mean review 2.57, 54.1% low reviews; on-time orders: 4.29, 9.2% (difference -1.73 stars, 95% confidence interval -1.77 to -1.69; Mann-Whitney test, effect size -0.55). 1 to 6 days late: 3.26 and 33.8% low reviews; 7 or more days late: about 1.7 and 78% low reviews. Repeat purchase within 90 days: 2.03% after a late first order and 2.31% after an on-time one (difference -0.28 points, confidence interval -0.64 to +0.08, p = 0.148). The effect on repeat purchase, if any, is small. R$1.16M (8.8%) of window revenue sits on late orders.
 
 ## 4. Why are deliveries late? (Stage 5)
 - Carrier transit accounts for about 93% of the extra time of late orders (17.0 of 18.3 extra median days); seller dispatch accounts for 1.3 days.
