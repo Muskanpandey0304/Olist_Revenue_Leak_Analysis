@@ -1,0 +1,28 @@
+state_code,state_name,region,population,income_pc
+RO,Rondonia,North,1757589,1113
+AC,Acre,North,869265,909
+AM,Amazonas,North,4080611,791
+RR,Roraima,North,576568,1204
+PA,Para,North,8513497,863
+AP,Amapa,North,829494,857
+TO,Tocantins,North,1555229,1045
+MA,Maranhao,Northeast,7035055,605
+PI,Piaui,Northeast,3264531,817
+CE,Ceara,Northeast,9075649,855
+RN,Rio Grande do Norte,Northeast,3479010,956
+PB,Paraiba,Northeast,3996496,898
+PE,Pernambuco,Northeast,9496294,871
+AL,Alagoas,Northeast,3322820,714
+SE,Sergipe,Northeast,2278308,906
+BA,Bahia,Northeast,14812617,841
+MG,Minas Gerais,Southeast,21040662,1322
+ES,Espirito Santo,Southeast,3972388,1295
+RJ,Rio de Janeiro,Southeast,17159960,1689
+SP,Sao Paulo,Southeast,45538936,1898
+PR,Parana,South,11348937,1607
+SC,Santa Catarina,South,7075494,1660
+RS,Rio Grande do Sul,South,11329605,1705
+MS,Mato Grosso do Sul,Center-West,2748023,1439
+MT,Mato Grosso,Center-West,3441998,1386
+GO,Goias,Center-West,6921161,1323
+DF,Distrito Federal,Center-West,2974703,2460

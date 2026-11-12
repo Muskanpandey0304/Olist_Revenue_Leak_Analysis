@@ -1,0 +1,7 @@
+segment,customers,revenue,avg_spend,median_recency_days,pct_customers,pct_revenue
+One-time high value - lapsed,10758,4143980.0,385.2,318.0,11.6,31.4
+One-time standard - lapsed,43206,3209199.0,74.3,314.0,46.4,24.3
+One-time high value - recent,7311,2898452.0,396.5,98.0,7.9,22.0
+One-time standard - recent,29032,2202792.0,75.9,95.0,31.2,16.7
+Repeat - lapsed,1579,398483.0,252.4,298.0,1.7,3.0
+Repeat - active,1210,326872.0,270.1,92.0,1.3,2.5

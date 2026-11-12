@@ -1,0 +1,9 @@
+﻿.venv/
+__pycache__/
+.ipynb_checkpoints/
+*.db
+data/raw/olist/*.csv
+data/staging/*.csv
+data/marts/*.csv
+.env
+dashboard/data/
