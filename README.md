@@ -3,7 +3,7 @@
 **Where does a Brazilian online marketplace lose money, and what should it fix first?**
 An end-to-end analysis of about 100,000 Olist orders (2016 to 2018), combined with official IBGE state data, using SQL, Python, statistics and a tested data pipeline, with an Excel workbook and a Power BI dashboard for the business teams.
 
-> **Live dashboard:** https://muskanpandey0304.github.io/Olist_Revenue_Leak_Analysis/ *(works once GitHub Pages is turned on, see below)* &nbsp;|&nbsp; **Power BI file:** [`dashboard/powerbi/olist_revenue_leak.pbix`](dashboard/powerbi/olist_revenue_leak.pbix) &nbsp;|&nbsp; **2-minute walkthrough:** *(add the video link here)*
+> **Live dashboard:** https://muskanpandey0304.github.io/Olist_Revenue_Leak_Analysis/ &nbsp;|&nbsp; **Power BI file:** [`dashboard/powerbi/olist_revenue_leak.pbix`](dashboard/powerbi/olist_revenue_leak.pbix)
 
 <img src="docs/screenshots/overview.png" width="80%">
 

@@ -148,7 +148,6 @@ Name it **Regions**.
 - **View → Page view → Fit to page** on every page; make sure nothing overlaps.
 - **Save** the file (Ctrl+S).
 - **Screenshots**: show a page, press **Win + Shift + S**, drag over the report, paste into Paint and save as `dashboard/powerbi/page1_overview.png` and so on (four images).
-- **Record the video** (the 2-minute walkthrough): Windows **Win + G** → Capture, or the free OBS Studio.
 
 ## Step 9. Put it on GitHub
 ```
