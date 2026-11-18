@@ -1,0 +1,51 @@
+table rfm_segments
+
+	column customer_unique_id
+		dataType: string
+		sourceColumn: customer_unique_id
+		summarizeBy: none
+
+	column frequency
+		dataType: int64
+		sourceColumn: frequency
+		summarizeBy: none
+
+	column monetary
+		dataType: double
+		formatString: \R\$#,##0
+		sourceColumn: monetary
+		summarizeBy: none
+
+	column recency_days
+		dataType: int64
+		sourceColumn: recency_days
+		summarizeBy: none
+
+	column segment
+		dataType: string
+		sourceColumn: segment
+		summarizeBy: none
+
+	column decile
+		dataType: int64
+		sourceColumn: decile
+		summarizeBy: none
+
+	measure 'Segment Customers' = COUNTROWS(rfm_segments)
+		formatString: #,##0
+
+	measure 'Segment Revenue' = SUM(rfm_segments[monetary])
+		formatString: \R\$#,##0
+
+	measure 'Segment Revenue %' = DIVIDE([Segment Revenue], CALCULATE([Segment Revenue], ALL(rfm_segments)))
+		formatString: 0.0%
+
+	partition rfm_segments = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="rfm_segments", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"customer_unique_id", type text}, {"frequency", Int64.Type}, {"monetary", type number}, {"recency_days", Int64.Type}, {"segment", type text}, {"decile", Int64.Type}})
+				in
+				    Typed

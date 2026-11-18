@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "de_callout",
+  "position": {
+    "x": 20,
+    "y": 60,
+    "z": 10,
+    "height": 44,
+    "width": 1240,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Late delivery hurts reviews, not repeat purchase (2.03% vs 2.31%, p = 0.15).",
+                    "textStyle": {
+                      "fontSize": "16pt",
+                      "color": "#EB6834",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

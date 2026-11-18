@@ -1,0 +1,59 @@
+table dim_date
+	dataCategory: Time
+
+	column date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isKey
+		sourceColumn: date
+		summarizeBy: none
+
+	column year
+		dataType: int64
+		sourceColumn: year
+		summarizeBy: none
+
+	column month
+		dataType: int64
+		sourceColumn: month
+		summarizeBy: none
+
+	column year_month
+		dataType: string
+		sourceColumn: year_month
+		summarizeBy: none
+
+	column quarter
+		dataType: int64
+		sourceColumn: quarter
+		summarizeBy: none
+
+	column weekday_num
+		dataType: int64
+		sourceColumn: weekday_num
+		summarizeBy: none
+
+	column is_weekend
+		dataType: int64
+		sourceColumn: is_weekend
+		summarizeBy: none
+
+	column is_holiday
+		dataType: int64
+		sourceColumn: is_holiday
+		summarizeBy: none
+
+	column holiday_name
+		dataType: string
+		sourceColumn: holiday_name
+		summarizeBy: none
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="dim_date", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"date", type date}, {"year", Int64.Type}, {"month", Int64.Type}, {"year_month", type text}, {"quarter", Int64.Type}, {"weekday_num", Int64.Type}, {"is_weekend", Int64.Type}, {"is_holiday", Int64.Type}, {"holiday_name", type text}})
+				in
+				    Typed

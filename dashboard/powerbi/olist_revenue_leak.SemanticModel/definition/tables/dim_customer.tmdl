@@ -1,0 +1,31 @@
+table dim_customer
+
+	column customer_unique_id
+		dataType: string
+		sourceColumn: customer_unique_id
+		summarizeBy: none
+
+	column city
+		dataType: string
+		sourceColumn: city
+		summarizeBy: none
+
+	column state
+		dataType: string
+		sourceColumn: state
+		summarizeBy: none
+
+	column region
+		dataType: string
+		sourceColumn: region
+		summarizeBy: none
+
+	partition dim_customer = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="dim_customer", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"customer_unique_id", type text}, {"city", type text}, {"state", type text}, {"region", type text}})
+				in
+				    Typed

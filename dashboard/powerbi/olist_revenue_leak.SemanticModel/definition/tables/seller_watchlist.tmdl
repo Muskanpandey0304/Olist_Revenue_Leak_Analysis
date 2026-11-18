@@ -1,0 +1,55 @@
+table seller_watchlist
+
+	column seller_id
+		dataType: string
+		sourceColumn: seller_id
+		summarizeBy: none
+
+	column seller_state
+		dataType: string
+		sourceColumn: seller_state
+		summarizeBy: none
+
+	column orders
+		dataType: int64
+		sourceColumn: orders
+		summarizeBy: none
+
+	column late_orders
+		dataType: int64
+		sourceColumn: late_orders
+		summarizeBy: none
+
+	column late_pct
+		dataType: double
+		formatString: 0.0
+		sourceColumn: late_pct
+		summarizeBy: none
+
+	column expected_pct
+		dataType: double
+		formatString: 0.0
+		sourceColumn: expected_pct
+		summarizeBy: none
+
+	column excess_late
+		dataType: double
+		formatString: 0.0
+		sourceColumn: excess_late
+		summarizeBy: none
+
+	column revenue
+		dataType: double
+		formatString: \R\$#,##0
+		sourceColumn: revenue
+		summarizeBy: none
+
+	partition seller_watchlist = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="seller_watchlist", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"seller_id", type text}, {"seller_state", type text}, {"orders", Int64.Type}, {"late_orders", Int64.Type}, {"late_pct", type number}, {"expected_pct", type number}, {"excess_late", type number}, {"revenue", type number}})
+				in
+				    Typed

@@ -1,0 +1,168 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "re_scatter",
+  "position": {
+    "x": 20,
+    "y": 70,
+    "z": 10,
+    "height": 635,
+    "width": 620,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "state_code"
+                }
+              },
+              "queryRef": "states.state_code",
+              "nativeQueryRef": "state_code",
+              "active": true
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "states"
+                        }
+                      },
+                      "Property": "income_pc"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(states.income_pc)",
+              "nativeQueryRef": "Sum of income_pc",
+              "displayName": "Income per capita (R$/month)"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "states"
+                        }
+                      },
+                      "Property": "rev_per_1000"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(states.rev_per_1000)",
+              "nativeQueryRef": "Sum of rev_per_1000",
+              "displayName": "Revenue per 1,000 residents (R$)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "categoryLabels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solidColor": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2A78D6'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'States with higher income buy far more per resident'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Scatter of household income per capita against revenue per 1,000 residents by state'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

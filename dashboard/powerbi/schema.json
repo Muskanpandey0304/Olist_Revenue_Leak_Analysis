@@ -1,0 +1,94 @@
+{
+ "dim_date": {
+  "date": "datetime64[us]",
+  "year": "int64",
+  "month": "int64",
+  "year_month": "str",
+  "quarter": "int64",
+  "weekday_num": "int64",
+  "is_weekend": "int64",
+  "is_holiday": "int64",
+  "holiday_name": "str"
+ },
+ "dim_customer": {
+  "customer_unique_id": "str",
+  "city": "str",
+  "state": "str",
+  "region": "str"
+ },
+ "dim_seller": {
+  "seller_id": "str",
+  "city": "str",
+  "state": "str",
+  "region": "str"
+ },
+ "dim_product": {
+  "product_id": "str",
+  "category": "str",
+  "weight_g": "float64",
+  "volume_cm3": "float64"
+ },
+ "fact_orders": {
+  "order_id": "str",
+  "customer_unique_id": "str",
+  "customer_state": "str",
+  "purchase_date": "datetime64[us]",
+  "order_status": "str",
+  "is_revenue_order": "int64",
+  "is_late": "float64",
+  "delivery_days": "float64",
+  "estimated_days": "int64",
+  "review_score": "float64",
+  "items_price": "float64",
+  "freight_total": "float64",
+  "avg_distance_km": "float64",
+  "n_items": "int64",
+  "main_payment_type": "str",
+  "delivery_bucket": "object",
+  "distance_band": "object",
+  "low_review": "float64"
+ },
+ "fact_order_items": {
+  "order_id": "str",
+  "order_item_id": "int64",
+  "product_id": "str",
+  "seller_id": "str",
+  "price": "float64",
+  "freight_value": "float64",
+  "is_revenue_item": "int64",
+  "distance_km": "float64"
+ },
+ "rfm_segments": {
+  "customer_unique_id": "str",
+  "frequency": "int64",
+  "monetary": "float64",
+  "recency_days": "int64",
+  "segment": "str",
+  "decile": "int64"
+ },
+ "states": {
+  "state_code": "str",
+  "state_name": "str",
+  "region": "str",
+  "population": "int64",
+  "income_pc": "int64",
+  "revenue": "float64",
+  "orders": "int64",
+  "rev_per_1000": "float64",
+  "expected_rev_per_1000": "float64",
+  "penetration_vs_expected": "float64",
+  "avg_freight_ratio": "float64",
+  "late_pct": "float64",
+  "avg_delivery_days": "float64"
+ },
+ "seller_watchlist": {
+  "seller_id": "str",
+  "seller_state": "str",
+  "orders": "int64",
+  "late_orders": "int64",
+  "late_pct": "float64",
+  "expected_pct": "float64",
+  "excess_late": "float64",
+  "revenue": "float64"
+ }
+}

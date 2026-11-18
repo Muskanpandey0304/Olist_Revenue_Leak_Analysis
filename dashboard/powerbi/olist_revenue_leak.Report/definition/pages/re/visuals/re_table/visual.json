@@ -1,0 +1,189 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "re_table",
+  "position": {
+    "x": 660,
+    "y": 70,
+    "z": 20,
+    "height": 450,
+    "width": 600,
+    "tabOrder": 20
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "state_code"
+                }
+              },
+              "queryRef": "states.state_code",
+              "nativeQueryRef": "state_code"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "income_pc"
+                }
+              },
+              "queryRef": "states.income_pc",
+              "nativeQueryRef": "income_pc"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "revenue"
+                }
+              },
+              "queryRef": "states.revenue",
+              "nativeQueryRef": "revenue"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "rev_per_1000"
+                }
+              },
+              "queryRef": "states.rev_per_1000",
+              "nativeQueryRef": "rev_per_1000"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "penetration_vs_expected"
+                }
+              },
+              "queryRef": "states.penetration_vs_expected",
+              "nativeQueryRef": "penetration_vs_expected"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "late_pct"
+                }
+              },
+              "queryRef": "states.late_pct",
+              "nativeQueryRef": "late_pct"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "states"
+                    }
+                  },
+                  "Property": "avg_delivery_days"
+                }
+              },
+              "queryRef": "states.avg_delivery_days",
+              "nativeQueryRef": "avg_delivery_days"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "states"
+                  }
+                },
+                "Property": "rev_per_1000"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'State opportunity'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Table of states with income, revenue per resident and delivery'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

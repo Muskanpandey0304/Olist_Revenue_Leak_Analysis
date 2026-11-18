@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "cu_callout",
+  "position": {
+    "x": 440,
+    "y": 80,
+    "z": 10,
+    "height": 70,
+    "width": 820,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Only 3.0% of customers ever placed a second order.",
+                    "textStyle": {
+                      "fontSize": "20pt",
+                      "color": "#EB6834",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

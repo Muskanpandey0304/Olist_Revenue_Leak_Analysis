@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Olist Revenue Leak Dashboard</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f3f0; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --grid: #e3e2de; --line: #d7d6d1;
+    --blue: #2a78d6; --orange: #eb6834;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #121211; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --grid: #2e2e2c; --line: #3a3a37;
+      --blue: #3987e5; --orange: #d95926;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #121211; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --grid: #2e2e2c; --line: #3a3a37;
+    --blue: #3987e5; --orange: #d95926;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: var(--ink2); margin: 0 0 18px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  nav button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  nav button[aria-selected="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  nav button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .kpi .v { font-size: 26px; font-weight: 700; line-height: 1.15; }
+  .kpi .l { color: var(--ink2); font-size: 13px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .card h2 { font-size: 16px; margin: 0 0 2px; }
+  .card .d { color: var(--ink2); font-size: 13px; margin: 0 0 10px; }
+  .chart { position: relative; height: 300px; }
+  .chart.tall { height: 340px; }
+  .note { color: var(--ink2); font-size: 13px; margin: 8px 0 0; }
+  .callout { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--orange); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--ink2); font-weight: 600; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink2); font-size: 13px; }
+  .tablewrap { overflow-x: auto; }
+  footer { color: var(--ink2); font-size: 12.5px; margin-top: 26px; }
+  section[hidden] { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Olist Revenue Leak Analysis</h1>
+  <p class="sub">Where does a Brazilian marketplace lose revenue? Delivered orders, January 2017 to August 2018. Revenue is item price, freight excluded.</p>
+  <nav role="tablist" aria-label="Dashboard pages">
+    <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="customers" aria-selected="false">Customers</button>
+    <button role="tab" data-tab="delivery" aria-selected="false">Delivery</button>
+    <button role="tab" data-tab="regions" aria-selected="false">Regions</button>
+  </nav>
+
+  <section id="tab-overview">
+    <div class="cards" id="kpis"></div>
+    <div class="grid2">
+      <div class="card"><h2>Growth has been flat since January 2018</h2><p class="d">Monthly revenue (R$ thousand)</p><div class="chart"><canvas id="c-monthly" role="img" aria-label="Line chart of monthly revenue"></canvas></div></div>
+      <div class="card"><h2>18 of 74 categories bring 80% of revenue</h2><p class="d">Top 10 categories by revenue (R$ thousand)</p><div class="chart"><canvas id="c-cats" role="img" aria-label="Bar chart of top 10 categories"></canvas></div></div>
+    </div>
+    <div class="card"><h2>Monthly figures</h2><details><summary>Show table</summary><div class="tablewrap" id="t-monthly"></div></details></div>
+  </section>
+
+  <section id="tab-customers" hidden>
+    <div class="callout"><strong>Only 3.0% of customers ever placed a second order.</strong> Within 90 days of a first order the rate is 2.3%. Repeat customers spend about twice as much (R$260 vs R$138) but are 3.0% of customers and 5.5% of revenue.</div>
+    <div class="grid2">
+      <div class="card"><h2>The top 10% of customers bring 41% of revenue</h2><p class="d">Share of revenue by customer decile (1 = highest spenders)</p><div class="chart"><canvas id="c-deciles" role="img" aria-label="Bar chart of revenue share by customer decile"></canvas></div></div>
+      <div class="card"><h2>Most revenue sits with one-time buyers</h2><p class="d">Revenue by customer segment (R$ million)</p><div class="chart"><canvas id="c-segments" role="img" aria-label="Bar chart of revenue by segment"></canvas></div><p class="note">First win-back target: the 7,311 recent high-value one-time customers (R$2.9M past spend).</p></div>
+    </div>
+    <div class="card"><h2>Segments</h2><div class="tablewrap" id="t-segments"></div><p class="note">One-time buyers split at the 80th percentile of spend (R$175.99). Recent = last order within 180 days of 1 September 2018.</p></div>
+  </section>
+
+  <section id="tab-delivery" hidden>
+    <div class="callout"><strong>Late delivery hurts reviews, not repeat purchase.</strong> Customers whose first order was late came back at 2.03% against 2.31% (not significant, p = 0.15). About 93% of the extra time in late orders is carrier transit.</div>
+    <div class="grid2">
+      <div class="card"><h2>Reviews collapse from 7 days late</h2><p class="d">Average review score by delivery outcome</p><div class="chart"><canvas id="c-review" role="img" aria-label="Bar chart of average review by delivery outcome"></canvas></div></div>
+      <div class="card"><h2>Further away means later</h2><p class="d">Late rate (%) by seller-to-customer distance</p><div class="chart"><canvas id="c-dist" role="img" aria-label="Bar chart of late rate by distance"></canvas></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>Rio de Janeiro is the outlier</h2><p class="d">Ten states with the highest late rate (%), 500+ orders</p><div class="chart tall"><canvas id="c-latestate" role="img" aria-label="Bar chart of late rate by state"></canvas></div><p class="note">Orange: Rio de Janeiro, 13.5% late at a median of about 394 km, against 5.0% to 5.9% in SP, MG and PR.</p></div>
+      <div class="card"><h2>Sellers worse than their routes explain</h2><p class="d">Top 10 of 57 sellers with 50+ orders, by excess late orders</p><div class="tablewrap" id="t-sellers"></div><p class="note">The 57 sellers handle 15.4% of orders and 25.3% of late orders.</p></div>
+    </div>
+  </section>
+
+  <section id="tab-regions" hidden>
+    <div class="callout"><strong>States with higher income buy far more per resident.</strong> Income explains 62% of the variation (SP excluded), and sales are lowest where delivery is slowest and freight dearest. Paraná is the proposed first test.</div>
+    <div class="card"><h2>Income against revenue per resident</h2><p class="d">Each dot is a state. Hover for details. Orange: Paraná.</p><div class="chart tall"><canvas id="c-states" role="img" aria-label="Scatter plot of income against revenue per 1000 residents by state"></canvas></div></div>
+    <div class="card" style="margin-top:14px"><h2>State table</h2><details open><summary>Sorted by revenue per 1,000 residents</summary><div class="tablewrap" id="t-states"></div></details>
+    <p class="note">Population: IBGE estimate, 1 July 2018. Income: IBGE PNAD Contínua 2018. Expected = fitted on income across 26 states (SP excluded).</p></div>
+  </section>
+
+  <footer>Data: Olist public e-commerce dataset (Kaggle), IBGE, Brazilian public holidays. All figures are observational; money figures in the report are scenarios, not forecasts. Method, tests and code are in the project repository.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const D = /*DATA*/null;
+
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const nf = new Intl.NumberFormat("en-US");
+const brl = n => "R$" + nf.format(Math.round(n));
+const pct = (n, d = 1) => n.toFixed(d) + "%";
+
+// ---------- direct value labels on bars ----------
+const valueLabels = {
+  id: "valueLabels",
+  afterDatasetsDraw(chart, _a, opts) {
+    if (!opts || !opts.format) return;
+    const { ctx } = chart;
+    ctx.save();
+    ctx.fillStyle = css("--ink");
+    ctx.font = "12px system-ui, sans-serif";
+    const horizontal = chart.options.indexAxis === "y";
+    chart.getDatasetMeta(0).data.forEach((bar, i) => {
+      const v = chart.data.datasets[0].data[i];
+      const t = opts.format(v);
+      if (horizontal) { ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(t, bar.x + 6, bar.y); }
+      else { ctx.textAlign = "center"; ctx.textBaseline = "bottom"; ctx.fillText(t, bar.x, bar.y - 4); }
+    });
+    ctx.restore();
+  }
+};
+Chart.register(valueLabels);
+
+// ---------- direct labels for chosen points on the scatter ----------
+Chart.register({
+  id: "pointLabels",
+  afterDatasetsDraw(chart, _a, opts) {
+    if (!opts || !opts.codes) return;
+    const { ctx } = chart;
+    ctx.save();
+    ctx.fillStyle = css("--ink");
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.textBaseline = "middle";
+    chart.getDatasetMeta(0).data.forEach((pt, i) => {
+      const s = chart.data.datasets[0].data[i].s;
+      if (opts.codes.includes(s.state_code)) { ctx.textAlign = "left"; ctx.fillText(s.state_code, pt.x + 9, pt.y - 3); }
+    });
+    ctx.restore();
+  }
+});
+
+function baseOptions(extra = {}) {
+  const grid = css("--grid"), ink2 = css("--ink2");
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false,
+    animation: false,
+    plugins: { legend: { display: false }, tooltip: { backgroundColor: css("--card"), titleColor: css("--ink"), bodyColor: css("--ink"), borderColor: css("--line"), borderWidth: 1, padding: 10 } },
+    scales: {
+      x: { grid: { color: grid }, border: { color: grid }, ticks: { color: ink2 } },
+      y: { grid: { color: grid }, border: { color: grid }, ticks: { color: ink2 }, beginAtZero: true }
+    }
+  }, extra);
+}
+
+function table(el, head, rows) {
+  document.getElementById(el).innerHTML =
+    "<table><thead><tr>" + head.map(h => `<th>${h}</th>`).join("") + "</tr></thead><tbody>" +
+    rows.map(r => "<tr>" + r.map(c => `<td>${c}</td>`).join("") + "</tr>").join("") + "</tbody></table>";
+}
+
+// ---------- static pieces (tables, KPI cards) ----------
+function renderStatic() {
+  const k = D.kpis;
+  document.getElementById("kpis").innerHTML = [
+    ["Revenue", "R$" + (k.revenue / 1e6).toFixed(2) + "M"], ["Delivered orders", nf.format(k.orders)],
+    ["Customers", nf.format(k.customers)], ["Average order value", "R$" + k.aov.toFixed(0)],
+    ["Repeat rate", pct(k.repeat_rate)], ["Late delivery rate", pct(k.late_rate)]
+  ].map(([l, v]) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  table("t-monthly", ["Month", "Revenue", "Orders", "Active customers"],
+    D.monthly.map(m => [m.year_month, brl(m.revenue), nf.format(m.orders), nf.format(m.active_customers)]));
+  table("t-segments", ["Segment", "Customers", "% customers", "Revenue", "% revenue", "Avg spend"],
+    D.segments.map(s => [s.segment, nf.format(s.customers), pct(s.pct_customers), brl(s.revenue), pct(s.pct_revenue), brl(s.avg_spend)]));
+  table("t-sellers", ["Seller", "State", "Orders", "Late %", "Expected %", "Excess"],
+    D.sellers.map(s => [s.seller_id.slice(0, 8) + "…", s.seller_state, nf.format(s.orders), pct(s.late_pct), pct(s.expected_pct), s.excess_late.toFixed(0)]));
+  table("t-states", ["State", "Income (R$/mo)", "Revenue", "Per 1,000 residents", "vs expected", "Late %", "Avg delivery days"],
+    D.states.map(s => [s.state_code, nf.format(s.income_pc), brl(s.revenue), "R$" + s.rev_per_1000.toFixed(1),
+      Math.round(100 * s.penetration_vs_expected) + "%", pct(s.late_pct), s.avg_delivery_days.toFixed(1)]));
+}
+
+// ---------- charts, built per tab so canvases have a size ----------
+const builders = {
+  overview() {
+    const blue = css("--blue");
+    return [
+      new Chart("c-monthly", { type: "line", data: { labels: D.monthly.map(m => m.year_month), datasets: [{ data: D.monthly.map(m => m.revenue / 1000), borderColor: blue, backgroundColor: blue, borderWidth: 2, pointRadius: 4, pointBackgroundColor: blue, pointBorderColor: css("--card"), pointBorderWidth: 2, tension: 0 }] },
+        options: baseOptions({ plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => "Revenue: R$" + nf.format(Math.round(c.parsed.y)) + "k" } } }, scales: { x: { ticks: { color: css("--ink2"), maxTicksLimit: 7 }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: css("--ink2") }, grid: { color: css("--grid") }, border: { display: false } } } }) }),
+      new Chart("c-cats", { type: "bar", data: { labels: D.categories.map(c => c.category), datasets: [{ data: D.categories.map(c => c.revenue / 1000), backgroundColor: blue, borderRadius: 3, barThickness: 16 }] },
+        options: baseOptions({ indexAxis: "y", layout: { padding: { right: 56 } }, plugins: { legend: { display: false }, valueLabels: { format: v => "R$" + nf.format(Math.round(v)) + "k" }, tooltip: { callbacks: { label: c => "R$" + nf.format(Math.round(c.parsed.x)) + "k (" + D.categories[c.dataIndex].share.toFixed(1) + "% of revenue)" } } }, scales: { x: { display: false, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: css("--ink2") }, border: { display: false } } } }) })
+    ];
+  },
+  customers() {
+    const blue = css("--blue");
+    return [
+      new Chart("c-deciles", { type: "bar", data: { labels: D.deciles.map(d => d.decile), datasets: [{ data: D.deciles.map(d => d.share), backgroundColor: blue, borderRadius: 3 }] },
+        options: baseOptions({ layout: { padding: { top: 18 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(1) + "%" }, tooltip: { callbacks: { title: c => "Decile " + c[0].label, label: c => c.parsed.y.toFixed(1) + "% of revenue, " + nf.format(D.deciles[c.dataIndex].customers) + " customers" } } }, scales: { x: { grid: { display: false }, ticks: { color: css("--ink2") }, title: { display: true, text: "Customer decile by total spend", color: css("--ink2") } }, y: { display: false, beginAtZero: true, max: 48 } } }) }),
+      new Chart("c-segments", { type: "bar", data: { labels: D.segments.map(s => s.segment), datasets: [{ data: D.segments.map(s => s.revenue / 1e6), backgroundColor: D.segments.map(s => s.segment === "One-time high value - recent" ? css("--orange") : blue), borderRadius: 3, barThickness: 18 }] },
+        options: baseOptions({ indexAxis: "y", layout: { padding: { right: 56 } }, plugins: { legend: { display: false }, valueLabels: { format: v => "R$" + v.toFixed(2) + "M" }, tooltip: { callbacks: { label: c => "R$" + c.parsed.x.toFixed(2) + "M from " + nf.format(D.segments[c.dataIndex].customers) + " customers" } } }, scales: { x: { display: false, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: css("--ink2"), font: { size: 11 } }, border: { display: false } } } }) })
+    ];
+  },
+  delivery() {
+    const blue = css("--blue"), orange = css("--orange");
+    return [
+      new Chart("c-review", { type: "bar", data: { labels: D.delivery.map(d => d.label), datasets: [{ data: D.delivery.map(d => d.avg_review), backgroundColor: blue, borderRadius: 3 }] },
+        options: baseOptions({ layout: { padding: { top: 18 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(2) }, tooltip: { callbacks: { label: c => "Average review " + c.parsed.y.toFixed(2) + "; " + D.delivery[c.dataIndex].pct_low_review.toFixed(0) + "% rated 1-2 stars; " + nf.format(D.delivery[c.dataIndex].orders) + " orders" } } }, scales: { x: { grid: { display: false }, ticks: { color: css("--ink2") } }, y: { display: false, beginAtZero: true, max: 5 } } }) }),
+      new Chart("c-dist", { type: "bar", data: { labels: D.distance.map(d => d.band), datasets: [{ data: D.distance.map(d => d.late_pct), backgroundColor: blue, borderRadius: 3 }] },
+        options: baseOptions({ layout: { padding: { top: 18 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(1) + "%" }, tooltip: { callbacks: { label: c => c.parsed.y.toFixed(1) + "% late, " + nf.format(D.distance[c.dataIndex].orders) + " orders" } } }, scales: { x: { grid: { display: false }, ticks: { color: css("--ink2") } }, y: { display: false, beginAtZero: true, max: 16 } } }) }),
+      new Chart("c-latestate", { type: "bar", data: { labels: D.late_states.map(s => s.state_code), datasets: [{ data: D.late_states.map(s => s.late_pct), backgroundColor: D.late_states.map(s => s.state_code === "RJ" ? orange : blue), borderRadius: 3, barThickness: 18 }] },
+        options: baseOptions({ indexAxis: "y", layout: { padding: { right: 48 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(1) + "%" }, tooltip: { callbacks: { label: c => c.parsed.x.toFixed(1) + "% late, " + nf.format(D.late_states[c.dataIndex].orders) + " orders" } } }, scales: { x: { display: false, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: css("--ink2") }, border: { display: false } } } }) })
+    ];
+  },
+  regions() {
+    const blue = css("--blue"), orange = css("--orange");
+    return [
+      new Chart("c-states", { type: "scatter", data: { datasets: [{ data: D.states.map(s => ({ x: s.income_pc, y: s.rev_per_1000, s })), backgroundColor: D.states.map(s => s.state_code === "PR" ? orange : blue), pointRadius: 6, pointHoverRadius: 8, pointBorderColor: css("--card"), pointBorderWidth: 1.5 }] },
+        options: baseOptions({ plugins: { legend: { display: false }, pointLabels: { codes: ["SP", "RJ", "DF", "MG", "SC", "RS", "PR", "BA", "AM", "MA", "ES"] }, tooltip: { callbacks: { title: c => c[0].raw.s.state_name, label: c => { const s = c.raw.s; return ["Income R$" + nf.format(s.income_pc) + " per month", "Revenue R$" + s.rev_per_1000.toFixed(1) + " per 1,000 residents", "Late " + s.late_pct.toFixed(1) + "%, " + s.avg_delivery_days.toFixed(1) + " delivery days"]; } } } }, scales: { x: { title: { display: true, text: "Household income per capita, 2018 (R$ per month)", color: css("--ink2") }, grid: { color: css("--grid") }, ticks: { color: css("--ink2") } }, y: { title: { display: true, text: "Revenue per 1,000 residents (R$)", color: css("--ink2") }, beginAtZero: true, grid: { color: css("--grid") }, ticks: { color: css("--ink2") } } } }) })
+    ];
+  }
+};
+
+let current = "overview", charts = [];
+function show(tab) {
+  current = tab;
+  charts.forEach(c => c.destroy());
+  document.querySelectorAll("section[id^=tab-]").forEach(s => s.hidden = s.id !== "tab-" + tab);
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+  charts = builders[tab]();
+}
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => show(current));
+renderStatic();
+show(location.hash.slice(1) in builders ? location.hash.slice(1) : "overview");
+</script>
+</body>
+</html>

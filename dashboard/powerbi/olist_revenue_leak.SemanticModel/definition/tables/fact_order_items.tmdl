@@ -1,0 +1,51 @@
+table fact_order_items
+
+	column order_id
+		dataType: string
+		sourceColumn: order_id
+		summarizeBy: none
+
+	column order_item_id
+		dataType: int64
+		sourceColumn: order_item_id
+		summarizeBy: none
+
+	column product_id
+		dataType: string
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column seller_id
+		dataType: string
+		sourceColumn: seller_id
+		summarizeBy: none
+
+	column price
+		dataType: double
+		sourceColumn: price
+		summarizeBy: none
+
+	column freight_value
+		dataType: double
+		sourceColumn: freight_value
+		summarizeBy: none
+
+	column is_revenue_item
+		dataType: int64
+		sourceColumn: is_revenue_item
+		summarizeBy: none
+
+	column distance_km
+		dataType: double
+		sourceColumn: distance_km
+		summarizeBy: none
+
+	partition fact_order_items = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="fact_order_items", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"order_id", type text}, {"order_item_id", Int64.Type}, {"product_id", type text}, {"seller_id", type text}, {"price", type number}, {"freight_value", type number}, {"is_revenue_item", Int64.Type}, {"distance_km", type number}})
+				in
+				    Typed

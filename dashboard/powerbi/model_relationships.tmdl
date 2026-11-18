@@ -1,0 +1,26 @@
+createOrReplace
+
+	relationship rel_orders_date
+		fromColumn: fact_orders.purchase_date
+		toColumn: dim_date.date
+
+	relationship rel_orders_customer
+		fromColumn: fact_orders.customer_unique_id
+		toColumn: dim_customer.customer_unique_id
+
+	relationship rel_items_orders
+		fromColumn: fact_order_items.order_id
+		toColumn: fact_orders.order_id
+
+	relationship rel_items_seller
+		fromColumn: fact_order_items.seller_id
+		toColumn: dim_seller.seller_id
+
+	relationship rel_items_product
+		fromColumn: fact_order_items.product_id
+		toColumn: dim_product.product_id
+
+	relationship rel_rfm_customer
+		fromCardinality: one
+		fromColumn: rfm_segments.customer_unique_id
+		toColumn: dim_customer.customer_unique_id

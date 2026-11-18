@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Olist Revenue Leak Dashboard</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f3f0; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --grid: #e3e2de; --line: #d7d6d1;
+    --blue: #2a78d6; --orange: #eb6834;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #121211; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --grid: #2e2e2c; --line: #3a3a37;
+      --blue: #3987e5; --orange: #d95926;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #121211; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --grid: #2e2e2c; --line: #3a3a37;
+    --blue: #3987e5; --orange: #d95926;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: var(--ink2); margin: 0 0 18px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  nav button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  nav button[aria-selected="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  nav button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .kpi .v { font-size: 26px; font-weight: 700; line-height: 1.15; }
+  .kpi .l { color: var(--ink2); font-size: 13px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; margin-bottom: 14px; }
+  .card h2 { font-size: 16px; margin: 0 0 2px; }
+  .card .d { color: var(--ink2); font-size: 13px; margin: 0 0 10px; }
+  .chart { position: relative; height: 300px; }
+  .chart.tall { height: 340px; }
+  .note { color: var(--ink2); font-size: 13px; margin: 8px 0 0; }
+  .callout { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--orange); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--ink2); font-weight: 600; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--ink2); font-size: 13px; }
+  .tablewrap { overflow-x: auto; }
+  footer { color: var(--ink2); font-size: 12.5px; margin-top: 26px; }
+  section[hidden] { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Olist Revenue Leak Analysis</h1>
+  <p class="sub">Where does a Brazilian marketplace lose revenue? Delivered orders, January 2017 to August 2018. Revenue is item price, freight excluded.</p>
+  <nav role="tablist" aria-label="Dashboard pages">
+    <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="customers" aria-selected="false">Customers</button>
+    <button role="tab" data-tab="delivery" aria-selected="false">Delivery</button>
+    <button role="tab" data-tab="regions" aria-selected="false">Regions</button>
+  </nav>
+
+  <section id="tab-overview">
+    <div class="cards" id="kpis"></div>
+    <div class="grid2">
+      <div class="card"><h2>Growth has been flat since January 2018</h2><p class="d">Monthly revenue (R$ thousand)</p><div class="chart"><canvas id="c-monthly" role="img" aria-label="Line chart of monthly revenue"></canvas></div></div>
+      <div class="card"><h2>18 of 74 categories bring 80% of revenue</h2><p class="d">Top 10 categories by revenue (R$ thousand)</p><div class="chart"><canvas id="c-cats" role="img" aria-label="Bar chart of top 10 categories"></canvas></div></div>
+    </div>
+    <div class="card"><h2>Monthly figures</h2><details><summary>Show table</summary><div class="tablewrap" id="t-monthly"></div></details></div>
+  </section>
+
+  <section id="tab-customers" hidden>
+    <div class="callout"><strong>Only 3.0% of customers ever placed a second order.</strong> Within 90 days of a first order the rate is 2.3%. Repeat customers spend about twice as much (R$260 vs R$138) but are 3.0% of customers and 5.5% of revenue.</div>
+    <div class="grid2">
+      <div class="card"><h2>The top 10% of customers bring 41% of revenue</h2><p class="d">Share of revenue by customer decile (1 = highest spenders)</p><div class="chart"><canvas id="c-deciles" role="img" aria-label="Bar chart of revenue share by customer decile"></canvas></div></div>
+      <div class="card"><h2>Most revenue sits with one-time buyers</h2><p class="d">Revenue by customer segment (R$ million)</p><div class="chart"><canvas id="c-segments" role="img" aria-label="Bar chart of revenue by segment"></canvas></div><p class="note">First win-back target: the 7,311 recent high-value one-time customers (R$2.9M past spend).</p></div>
+    </div>
+    <div class="card"><h2>Segments</h2><div class="tablewrap" id="t-segments"></div><p class="note">One-time buyers split at the 80th percentile of spend (R$175.99). Recent = last order within 180 days of 1 September 2018.</p></div>
+  </section>
+
+  <section id="tab-delivery" hidden>
+    <div class="callout"><strong>Late delivery hurts reviews, not repeat purchase.</strong> Customers whose first order was late came back at 2.03% against 2.31% (not significant, p = 0.15). About 93% of the extra time in late orders is carrier transit.</div>
+    <div class="grid2">
+      <div class="card"><h2>Reviews collapse from 7 days late</h2><p class="d">Average review score by delivery outcome</p><div class="chart"><canvas id="c-review" role="img" aria-label="Bar chart of average review by delivery outcome"></canvas></div></div>
+      <div class="card"><h2>Further away means later</h2><p class="d">Late rate (%) by seller-to-customer distance</p><div class="chart"><canvas id="c-dist" role="img" aria-label="Bar chart of late rate by distance"></canvas></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>Rio de Janeiro is the outlier</h2><p class="d">Ten states with the highest late rate (%), 500+ orders</p><div class="chart tall"><canvas id="c-latestate" role="img" aria-label="Bar chart of late rate by state"></canvas></div><p class="note">Orange: Rio de Janeiro, 13.5% late at a median of about 394 km, against 5.0% to 5.9% in SP, MG and PR.</p></div>
+      <div class="card"><h2>Sellers worse than their routes explain</h2><p class="d">Top 10 of 57 sellers with 50+ orders, by excess late orders</p><div class="tablewrap" id="t-sellers"></div><p class="note">The 57 sellers handle 15.4% of orders and 25.3% of late orders.</p></div>
+    </div>
+  </section>
+
+  <section id="tab-regions" hidden>
+    <div class="callout"><strong>States with higher income buy far more per resident.</strong> Income explains 62% of the variation (SP excluded), and sales are lowest where delivery is slowest and freight dearest. Paraná is the proposed first test.</div>
+    <div class="card"><h2>Income against revenue per resident</h2><p class="d">Each dot is a state. Hover for details. Orange: Paraná.</p><div class="chart tall"><canvas id="c-states" role="img" aria-label="Scatter plot of income against revenue per 1000 residents by state"></canvas></div></div>
+    <div class="card" style="margin-top:14px"><h2>State table</h2><details open><summary>Sorted by revenue per 1,000 residents</summary><div class="tablewrap" id="t-states"></div></details>
+    <p class="note">Population: IBGE estimate, 1 July 2018. Income: IBGE PNAD Contínua 2018. Expected = fitted on income across 26 states (SP excluded).</p></div>
+  </section>
+
+  <footer>Data: Olist public e-commerce dataset (Kaggle), IBGE, Brazilian public holidays. All figures are observational; money figures in the report are scenarios, not forecasts. Method, tests and code are in the project repository.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const D = {"kpis": {"revenue": 13179777.95, "orders": 96203, "customers": 93096, "aov": 136.99965645561988, "repeat_rate": 2.9958322591733264, "late_rate": 8.130723574108915}, "monthly": [{"year_month": "2017-01", "revenue": 111798.36, "orders": 750, "active_customers": 718, "freight": 15684.01}, {"year_month": "2017-02", "revenue": 234223.4, "orders": 1653, "active_customers": 1630, "freight": 37015.92}, {"year_month": "2017-03", "revenue": 359198.85, "orders": 2546, "active_customers": 2508, "freight": 55132.1}, {"year_month": "2017-04", "revenue": 340669.68, "orders": 2303, "active_customers": 2274, "freight": 50142.72}, {"year_month": "2017-05", "revenue": 489159.25, "orders": 3545, "active_customers": 3478, "freight": 77498.15}, {"year_month": "2017-06", "revenue": 421923.37, "orders": 3135, "active_customers": 3076, "freight": 68127.0}, {"year_month": "2017-07", "revenue": 481604.52, "orders": 3872, "active_customers": 3802, "freight": 84694.56}, {"year_month": "2017-08", "revenue": 554699.7, "orders": 4193, "active_customers": 4114, "freight": 91132.66}, {"year_month": "2017-09", "revenue": 607399.67, "orders": 4150, "active_customers": 4083, "freight": 93677.82}, {"year_month": "2017-10", "revenue": 648247.65, "orders": 4478, "active_customers": 4417, "freight": 102869.36}, {"year_month": "2017-11", "revenue": 987648.07, "orders": 7288, "active_customers": 7182, "freight": 165581.3}, {"year_month": "2017-12", "revenue": 726033.19, "orders": 5513, "active_customers": 5450, "freight": 117045.1}, {"year_month": "2018-01", "revenue": 924645.0, "orders": 7069, "active_customers": 6974, "freight": 153242.46}, {"year_month": "2018-02", "revenue": 826437.13, "orders": 6555, "active_customers": 6400, "freight": 139731.28}, {"year_month": "2018-03", "revenue": 953356.25, "orders": 7003, "active_customers": 6914, "freight": 167241.99}, {"year_month": "2018-04", "revenue": 973534.09, "orders": 6798, "active_customers": 6744, "freight": 159344.84}, {"year_month": "2018-05", "revenue": 977544.69, "orders": 6749, "active_customers": 6693, "freight": 151229.83}, {"year_month": "2018-06", "revenue": 855591.97, "orders": 6096, "active_customers": 6058, "freight": 155856.99}, {"year_month": "2018-07", "revenue": 867486.47, "orders": 6156, "active_customers": 6097, "freight": 159800.05}, {"year_month": "2018-08", "revenue": 838576.64, "orders": 6351, "active_customers": 6310, "freight": 146915.0}], "categories": [{"category": "health_beauty", "revenue": 1229557.5, "orders": 8610, "share": 9.33}, {"category": "watches_gifts", "revenue": 1163187.91, "orders": 5489, "share": 8.83}, {"category": "bed_bath_table", "revenue": 1022955.77, "orders": 9267, "share": 7.76}, {"category": "sports_leisure", "revenue": 952661.4, "orders": 7512, "share": 7.23}, {"category": "computers_accessories", "revenue": 887944.6, "orders": 6517, "share": 6.74}, {"category": "furniture_decor", "revenue": 706237.17, "orders": 6258, "share": 5.36}, {"category": "housewares", "revenue": 614341.62, "orders": 5734, "share": 4.66}, {"category": "cool_stuff", "revenue": 609158.0, "orders": 3552, "share": 4.62}, {"category": "auto", "revenue": 577721.09, "orders": 3801, "share": 4.38}, {"category": "garden_tools", "revenue": 469135.4, "orders": 3443, "share": 3.56}], "deciles": [{"decile": 1, "customers": 9310, "revenue": 5417163.73, "avg_spend": 581.87, "share": 41.1}, {"decile": 2, "customers": 9310, "revenue": 2044988.35, "avg_spend": 219.66, "share": 15.52}, {"decile": 3, "customers": 9310, "revenue": 1458405.49, "avg_spend": 156.65, "share": 11.07}, {"decile": 4, "customers": 9310, "revenue": 1142284.6, "avg_spend": 122.69, "share": 8.67}, {"decile": 5, "customers": 9310, "revenue": 917491.62, "avg_spend": 98.55, "share": 6.96}, {"decile": 6, "customers": 9310, "revenue": 727987.02, "avg_spend": 78.19, "share": 5.52}, {"decile": 7, "customers": 9309, "revenue": 562641.22, "avg_spend": 60.44, "share": 4.27}, {"decile": 8, "customers": 9309, "revenue": 432556.14, "avg_spend": 46.47, "share": 3.28}, {"decile": 9, "customers": 9309, "revenue": 302709.41, "avg_spend": 32.52, "share": 2.3}, {"decile": 10, "customers": 9309, "revenue": 173550.37, "avg_spend": 18.64, "share": 1.32}], "segments": [{"segment": "One-time high value - lapsed", "customers": 10758, "revenue": 4143980.0, "avg_spend": 385.2, "median_recency_days": 318.0, "pct_customers": 11.6, "pct_revenue": 31.4}, {"segment": "One-time standard - lapsed", "customers": 43206, "revenue": 3209199.0, "avg_spend": 74.3, "median_recency_days": 314.0, "pct_customers": 46.4, "pct_revenue": 24.3}, {"segment": "One-time high value - recent", "customers": 7311, "revenue": 2898452.0, "avg_spend": 396.5, "median_recency_days": 98.0, "pct_customers": 7.9, "pct_revenue": 22.0}, {"segment": "One-time standard - recent", "customers": 29032, "revenue": 2202792.0, "avg_spend": 75.9, "median_recency_days": 95.0, "pct_customers": 31.2, "pct_revenue": 16.7}, {"segment": "Repeat - lapsed", "customers": 1579, "revenue": 398483.0, "avg_spend": 252.4, "median_recency_days": 298.0, "pct_customers": 1.7, "pct_revenue": 3.0}, {"segment": "Repeat - active", "customers": 1210, "revenue": 326872.0, "avg_spend": 270.1, "median_recency_days": 92.0, "pct_customers": 1.3, "pct_revenue": 2.5}], "delivery": [{"delivery": "1 On time", "orders": 88381, "revenue": 12021340.28, "avg_review": 4.29, "pct_low_review": 9.2, "label": "On time"}, {"delivery": "2 Late 1-6 days", "orders": 4234, "revenue": 596908.19, "avg_review": 3.26, "pct_low_review": 33.8, "label": "1-6 days late"}, {"delivery": "3 Late 7+ days", "orders": 3588, "revenue": 561529.48, "avg_review": 1.73, "pct_low_review": 78.3, "label": "7+ days late"}], "distance": [{"band": "<100 km", "orders": 17658, "late_pct": 6.5}, {"band": "100-300 km", "orders": 13118, "late_pct": 6.48}, {"band": "300-600 km", "orders": 30940, "late_pct": 7.88}, {"band": "600-1000 km", "orders": 17612, "late_pct": 8.59}, {"band": "1000-1500 km", "orders": 6463, "late_pct": 10.24}, {"band": "1500+ km", "orders": 8669, "late_pct": 13.18}], "late_states": [{"state_code": "MA", "late_pct": 19.64, "orders": 713}, {"state_code": "CE", "late_pct": 15.4, "orders": 1273}, {"state_code": "BA", "late_pct": 14.05, "orders": 3253}, {"state_code": "RJ", "late_pct": 13.52, "orders": 12310}, {"state_code": "PA", "late_pct": 12.42, "orders": 942}, {"state_code": "ES", "late_pct": 12.25, "orders": 1992}, {"state_code": "MS", "late_pct": 11.56, "orders": 701}, {"state_code": "PB", "late_pct": 11.05, "orders": 516}, {"state_code": "PE", "late_pct": 10.84, "orders": 1587}, {"state_code": "SC", "late_pct": 9.78, "orders": 3537}], "sellers": [{"seller_id": "4a3ca9315b744ce9f8e9374361493884", "seller_state": "SP", "orders": 1671, "late_pct": 11.37, "expected_pct": 8.07, "excess_late": 55.23}, {"seller_id": "06a2c3af7b3aee5d69171b0e14f0ee87", "seller_state": "MA", "orders": 386, "late_pct": 23.06, "expected_pct": 10.39, "excess_late": 48.9}, {"seller_id": "4869f7a5dfa277a7dca6462dcf3b52b2", "seller_state": "SP", "orders": 1110, "late_pct": 11.71, "expected_pct": 8.68, "excess_late": 33.67}, {"seller_id": "88460e8ebdecbfecb5f9601833981930", "seller_state": "PR", "orders": 227, "late_pct": 21.15, "expected_pct": 7.66, "excess_late": 30.61}, {"seller_id": "1f50f920176fa81dab994f9023523100", "seller_state": "SP", "orders": 1360, "late_pct": 10.88, "expected_pct": 8.65, "excess_late": 30.4}, {"seller_id": "8160255418d5aaa7dbdc9f4c64ebda44", "seller_state": "SP", "orders": 353, "late_pct": 16.71, "expected_pct": 8.3, "excess_late": 29.7}, {"seller_id": "ea8482cd71df3c1969d7b9473ff13abc", "seller_state": "SP", "orders": 1113, "late_pct": 10.6, "expected_pct": 8.33, "excess_late": 25.24}, {"seller_id": "e5a3438891c0bfdb9394643f95273d8e", "seller_state": "SP", "orders": 211, "late_pct": 18.96, "expected_pct": 7.91, "excess_late": 23.31}, {"seller_id": "7d13fca15225358621be4086e1eb0964", "seller_state": "SP", "orders": 546, "late_pct": 12.45, "expected_pct": 8.58, "excess_late": 21.16}, {"seller_id": "1025f0e2d44d7041d6cf58b6550e0bfa", "seller_state": "SP", "orders": 875, "late_pct": 10.51, "expected_pct": 8.21, "excess_late": 20.18}], "states": [{"state_code": "SP", "state_name": "Sao Paulo", "income_pc": 1898, "revenue": 5054516.95, "rev_per_1000": 110.993, "penetration_vs_expected": 1.443, "late_pct": 5.901, "avg_delivery_days": 8.274}, {"state_code": "RJ", "state_name": "Rio de Janeiro", "income_pc": 1689, "revenue": 1751433.85, "rev_per_1000": 102.065, "penetration_vs_expected": 1.601, "late_pct": 13.517, "avg_delivery_days": 14.836}, {"state_code": "DF", "state_name": "Distrito Federal", "income_pc": 2460, "revenue": 295454.64, "rev_per_1000": 99.322, "penetration_vs_expected": 0.851, "late_pct": 7.088, "avg_delivery_days": 12.48}, {"state_code": "MG", "state_name": "Minas Gerais", "income_pc": 1322, "revenue": 1548206.88, "rev_per_1000": 73.582, "penetration_vs_expected": 1.713, "late_pct": 5.628, "avg_delivery_days": 11.518}, {"state_code": "SC", "state_name": "Santa Catarina", "income_pc": 1660, "revenue": 504774.07, "rev_per_1000": 71.341, "penetration_vs_expected": 1.151, "late_pct": 9.782, "avg_delivery_days": 14.467}, {"state_code": "ES", "state_name": "Espirito Santo", "income_pc": 1295, "revenue": 267783.66, "rev_per_1000": 67.411, "penetration_vs_expected": 1.622, "late_pct": 12.249, "avg_delivery_days": 15.318}, {"state_code": "RS", "state_name": "Rio Grande do Sul", "income_pc": 1705, "revenue": 726194.92, "rev_per_1000": 64.097, "penetration_vs_expected": 0.99, "late_pct": 7.171, "avg_delivery_days": 14.808}, {"state_code": "PR", "state_name": "Parana", "income_pc": 1607, "revenue": 664048.0, "rev_per_1000": 58.512, "penetration_vs_expected": 0.995, "late_pct": 5.017, "avg_delivery_days": 11.508}, {"state_code": "MT", "state_name": "Mato Grosso", "income_pc": 1386, "revenue": 152143.82, "rev_per_1000": 44.202, "penetration_vs_expected": 0.953, "late_pct": 6.78, "avg_delivery_days": 17.606}, {"state_code": "MS", "state_name": "Mato Grosso do Sul", "income_pc": 1439, "revenue": 115429.97, "rev_per_1000": 42.005, "penetration_vs_expected": 0.853, "late_pct": 11.555, "avg_delivery_days": 15.191}, {"state_code": "GO", "state_name": "Goias", "income_pc": 1323, "revenue": 281932.21, "rev_per_1000": 40.735, "penetration_vs_expected": 0.947, "late_pct": 8.205, "avg_delivery_days": 15.156}, {"state_code": "BA", "state_name": "Bahia", "income_pc": 841, "revenue": 493339.26, "rev_per_1000": 33.305, "penetration_vs_expected": 1.606, "late_pct": 14.049, "avg_delivery_days": 18.865}, {"state_code": "TO", "state_name": "Tocantins", "income_pc": 1045, "revenue": 48402.51, "rev_per_1000": 31.122, "penetration_vs_expected": 1.058, "late_pct": 12.774, "avg_delivery_days": 17.226}, {"state_code": "PB", "state_name": "Paraiba", "income_pc": 898, "revenue": 112536.92, "rev_per_1000": 28.159, "penetration_vs_expected": 1.222, "late_pct": 11.047, "avg_delivery_days": 19.921}, {"state_code": "PE", "state_name": "Pernambuco", "income_pc": 871, "revenue": 250639.89, "rev_per_1000": 26.393, "penetration_vs_expected": 1.203, "late_pct": 10.838, "avg_delivery_days": 17.967}, {"state_code": "RO", "state_name": "Rondonia", "income_pc": 1113, "revenue": 45682.76, "rev_per_1000": 25.992, "penetration_vs_expected": 0.798, "late_pct": 2.881, "avg_delivery_days": 18.914}, {"state_code": "PI", "state_name": "Piaui", "income_pc": 817, "revenue": 84511.0, "rev_per_1000": 25.888, "penetration_vs_expected": 1.308, "late_pct": 16.0, "avg_delivery_days": 18.977}, {"state_code": "SE", "state_name": "Sergipe", "income_pc": 906, "revenue": 56288.74, "rev_per_1000": 24.706, "penetration_vs_expected": 1.057, "late_pct": 15.361, "avg_delivery_days": 20.949}, {"state_code": "CE", "state_name": "Ceara", "income_pc": 855, "revenue": 218107.7, "rev_per_1000": 24.032, "penetration_vs_expected": 1.128, "late_pct": 15.397, "avg_delivery_days": 20.789}, {"state_code": "AL", "state_name": "Alagoas", "income_pc": 714, "revenue": 78805.73, "rev_per_1000": 23.717, "penetration_vs_expected": 1.488, "late_pct": 23.99, "avg_delivery_days": 24.018}, {"state_code": "RN", "state_name": "Rio Grande do Norte", "income_pc": 956, "revenue": 81376.97, "rev_per_1000": 23.391, "penetration_vs_expected": 0.918, "late_pct": 10.851, "avg_delivery_days": 18.755}, {"state_code": "PA", "state_name": "Para", "income_pc": 863, "revenue": 173382.99, "rev_per_1000": 20.366, "penetration_vs_expected": 0.942, "late_pct": 12.42, "avg_delivery_days": 23.299}, {"state_code": "AC", "state_name": "Acre", "income_pc": 909, "revenue": 15930.97, "rev_per_1000": 18.327, "penetration_vs_expected": 0.78, "late_pct": 3.75, "avg_delivery_days": 20.638}, {"state_code": "MA", "state_name": "Maranhao", "income_pc": 605, "revenue": 116305.12, "rev_per_1000": 16.532, "penetration_vs_expected": 1.355, "late_pct": 19.635, "avg_delivery_days": 21.079}, {"state_code": "AP", "state_name": "Amapa", "income_pc": 857, "revenue": 13374.81, "rev_per_1000": 16.124, "penetration_vs_expected": 0.754, "late_pct": 4.478, "avg_delivery_days": 26.731}, {"state_code": "RR", "state_name": "Roraima", "income_pc": 1204, "revenue": 7017.77, "rev_per_1000": 12.172, "penetration_vs_expected": 0.329, "late_pct": 12.5, "avg_delivery_days": 29.5}, {"state_code": "AM", "state_name": "Amazonas", "income_pc": 791, "revenue": 22155.84, "rev_per_1000": 5.43, "penetration_vs_expected": 0.289, "late_pct": 4.138, "avg_delivery_days": 25.986}]};
+
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const nf = new Intl.NumberFormat("en-US");
+const brl = n => "R$" + nf.format(Math.round(n));
+const pct = (n, d = 1) => n.toFixed(d) + "%";
+
+// ---------- direct value labels on bars ----------
+const valueLabels = {
+  id: "valueLabels",
+  afterDatasetsDraw(chart, _a, opts) {
+    if (!opts || !opts.format) return;
+    const { ctx } = chart;
+    ctx.save();
+    ctx.fillStyle = css("--ink");
+    ctx.font = "12px system-ui, sans-serif";
+    const horizontal = chart.options.indexAxis === "y";
+    chart.getDatasetMeta(0).data.forEach((bar, i) => {
+      const v = chart.data.datasets[0].data[i];
+      const t = opts.format(v);
+      if (horizontal) { ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(t, bar.x + 6, bar.y); }
+      else { ctx.textAlign = "center"; ctx.textBaseline = "bottom"; ctx.fillText(t, bar.x, bar.y - 4); }
+    });
+    ctx.restore();
+  }
+};
+Chart.register(valueLabels);
+
+// ---------- direct labels for chosen points on the scatter ----------
+Chart.register({
+  id: "pointLabels",
+  afterDatasetsDraw(chart, _a, opts) {
+    if (!opts || !opts.codes) return;
+    const { ctx } = chart;
+    ctx.save();
+    ctx.fillStyle = css("--ink");
+    ctx.font = "12px system-ui, sans-serif";
+    ctx.textBaseline = "middle";
+    chart.getDatasetMeta(0).data.forEach((pt, i) => {
+      const s = chart.data.datasets[0].data[i].s;
+      if (opts.codes.includes(s.state_code)) { ctx.textAlign = "left"; ctx.fillText(s.state_code, pt.x + 9, pt.y - 3); }
+    });
+    ctx.restore();
+  }
+});
+
+function baseOptions(extra = {}) {
+  const grid = css("--grid"), ink2 = css("--ink2");
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false,
+    animation: false,
+    plugins: { legend: { display: false }, tooltip: { backgroundColor: css("--card"), titleColor: css("--ink"), bodyColor: css("--ink"), borderColor: css("--line"), borderWidth: 1, padding: 10 } },
+    scales: {
+      x: { grid: { color: grid }, border: { color: grid }, ticks: { color: ink2 } },
+      y: { grid: { color: grid }, border: { color: grid }, ticks: { color: ink2 }, beginAtZero: true }
+    }
+  }, extra);
+}
+
+function table(el, head, rows) {
+  document.getElementById(el).innerHTML =
+    "<table><thead><tr>" + head.map(h => `<th>${h}</th>`).join("") + "</tr></thead><tbody>" +
+    rows.map(r => "<tr>" + r.map(c => `<td>${c}</td>`).join("") + "</tr>").join("") + "</tbody></table>";
+}
+
+// ---------- static pieces (tables, KPI cards) ----------
+function renderStatic() {
+  const k = D.kpis;
+  document.getElementById("kpis").innerHTML = [
+    ["Revenue", "R$" + (k.revenue / 1e6).toFixed(2) + "M"], ["Delivered orders", nf.format(k.orders)],
+    ["Customers", nf.format(k.customers)], ["Average order value", "R$" + k.aov.toFixed(0)],
+    ["Repeat rate", pct(k.repeat_rate)], ["Late delivery rate", pct(k.late_rate)]
+  ].map(([l, v]) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  table("t-monthly", ["Month", "Revenue", "Orders", "Active customers"],
+    D.monthly.map(m => [m.year_month, brl(m.revenue), nf.format(m.orders), nf.format(m.active_customers)]));
+  table("t-segments", ["Segment", "Customers", "% customers", "Revenue", "% revenue", "Avg spend"],
+    D.segments.map(s => [s.segment, nf.format(s.customers), pct(s.pct_customers), brl(s.revenue), pct(s.pct_revenue), brl(s.avg_spend)]));
+  table("t-sellers", ["Seller", "State", "Orders", "Late %", "Expected %", "Excess"],
+    D.sellers.map(s => [s.seller_id.slice(0, 8) + "…", s.seller_state, nf.format(s.orders), pct(s.late_pct), pct(s.expected_pct), s.excess_late.toFixed(0)]));
+  table("t-states", ["State", "Income (R$/mo)", "Revenue", "Per 1,000 residents", "vs expected", "Late %", "Avg delivery days"],
+    D.states.map(s => [s.state_code, nf.format(s.income_pc), brl(s.revenue), "R$" + s.rev_per_1000.toFixed(1),
+      Math.round(100 * s.penetration_vs_expected) + "%", pct(s.late_pct), s.avg_delivery_days.toFixed(1)]));
+}
+
+// ---------- charts, built per tab so canvases have a size ----------
+const builders = {
+  overview() {
+    const blue = css("--blue");
+    return [
+      new Chart("c-monthly", { type: "line", data: { labels: D.monthly.map(m => m.year_month), datasets: [{ data: D.monthly.map(m => m.revenue / 1000), borderColor: blue, backgroundColor: blue, borderWidth: 2, pointRadius: 4, pointBackgroundColor: blue, pointBorderColor: css("--card"), pointBorderWidth: 2, tension: 0 }] },
+        options: baseOptions({ plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => "Revenue: R$" + nf.format(Math.round(c.parsed.y)) + "k" } } }, scales: { x: { ticks: { color: css("--ink2"), maxTicksLimit: 7 }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: css("--ink2") }, grid: { color: css("--grid") }, border: { display: false } } } }) }),
+      new Chart("c-cats", { type: "bar", data: { labels: D.categories.map(c => c.category), datasets: [{ data: D.categories.map(c => c.revenue / 1000), backgroundColor: blue, borderRadius: 3, barThickness: 16 }] },
+        options: baseOptions({ indexAxis: "y", layout: { padding: { right: 56 } }, plugins: { legend: { display: false }, valueLabels: { format: v => "R$" + nf.format(Math.round(v)) + "k" }, tooltip: { callbacks: { label: c => "R$" + nf.format(Math.round(c.parsed.x)) + "k (" + D.categories[c.dataIndex].share.toFixed(1) + "% of revenue)" } } }, scales: { x: { display: false, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: css("--ink2") }, border: { display: false } } } }) })
+    ];
+  },
+  customers() {
+    const blue = css("--blue");
+    return [
+      new Chart("c-deciles", { type: "bar", data: { labels: D.deciles.map(d => d.decile), datasets: [{ data: D.deciles.map(d => d.share), backgroundColor: blue, borderRadius: 3 }] },
+        options: baseOptions({ layout: { padding: { top: 18 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(1) + "%" }, tooltip: { callbacks: { title: c => "Decile " + c[0].label, label: c => c.parsed.y.toFixed(1) + "% of revenue, " + nf.format(D.deciles[c.dataIndex].customers) + " customers" } } }, scales: { x: { grid: { display: false }, ticks: { color: css("--ink2") }, title: { display: true, text: "Customer decile by total spend", color: css("--ink2") } }, y: { display: false, beginAtZero: true, max: 48 } } }) }),
+      new Chart("c-segments", { type: "bar", data: { labels: D.segments.map(s => s.segment), datasets: [{ data: D.segments.map(s => s.revenue / 1e6), backgroundColor: D.segments.map(s => s.segment === "One-time high value - recent" ? css("--orange") : blue), borderRadius: 3, barThickness: 18 }] },
+        options: baseOptions({ indexAxis: "y", layout: { padding: { right: 56 } }, plugins: { legend: { display: false }, valueLabels: { format: v => "R$" + v.toFixed(2) + "M" }, tooltip: { callbacks: { label: c => "R$" + c.parsed.x.toFixed(2) + "M from " + nf.format(D.segments[c.dataIndex].customers) + " customers" } } }, scales: { x: { display: false, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: css("--ink2"), font: { size: 11 } }, border: { display: false } } } }) })
+    ];
+  },
+  delivery() {
+    const blue = css("--blue"), orange = css("--orange");
+    return [
+      new Chart("c-review", { type: "bar", data: { labels: D.delivery.map(d => d.label), datasets: [{ data: D.delivery.map(d => d.avg_review), backgroundColor: blue, borderRadius: 3 }] },
+        options: baseOptions({ layout: { padding: { top: 18 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(2) }, tooltip: { callbacks: { label: c => "Average review " + c.parsed.y.toFixed(2) + "; " + D.delivery[c.dataIndex].pct_low_review.toFixed(0) + "% rated 1-2 stars; " + nf.format(D.delivery[c.dataIndex].orders) + " orders" } } }, scales: { x: { grid: { display: false }, ticks: { color: css("--ink2") } }, y: { display: false, beginAtZero: true, max: 5 } } }) }),
+      new Chart("c-dist", { type: "bar", data: { labels: D.distance.map(d => d.band), datasets: [{ data: D.distance.map(d => d.late_pct), backgroundColor: blue, borderRadius: 3 }] },
+        options: baseOptions({ layout: { padding: { top: 18 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(1) + "%" }, tooltip: { callbacks: { label: c => c.parsed.y.toFixed(1) + "% late, " + nf.format(D.distance[c.dataIndex].orders) + " orders" } } }, scales: { x: { grid: { display: false }, ticks: { color: css("--ink2") } }, y: { display: false, beginAtZero: true, max: 16 } } }) }),
+      new Chart("c-latestate", { type: "bar", data: { labels: D.late_states.map(s => s.state_code), datasets: [{ data: D.late_states.map(s => s.late_pct), backgroundColor: D.late_states.map(s => s.state_code === "RJ" ? orange : blue), borderRadius: 3, barThickness: 18 }] },
+        options: baseOptions({ indexAxis: "y", layout: { padding: { right: 48 } }, plugins: { legend: { display: false }, valueLabels: { format: v => v.toFixed(1) + "%" }, tooltip: { callbacks: { label: c => c.parsed.x.toFixed(1) + "% late, " + nf.format(D.late_states[c.dataIndex].orders) + " orders" } } }, scales: { x: { display: false, beginAtZero: true }, y: { grid: { display: false }, ticks: { color: css("--ink2") }, border: { display: false } } } }) })
+    ];
+  },
+  regions() {
+    const blue = css("--blue"), orange = css("--orange");
+    return [
+      new Chart("c-states", { type: "scatter", data: { datasets: [{ data: D.states.map(s => ({ x: s.income_pc, y: s.rev_per_1000, s })), backgroundColor: D.states.map(s => s.state_code === "PR" ? orange : blue), pointRadius: 6, pointHoverRadius: 8, pointBorderColor: css("--card"), pointBorderWidth: 1.5 }] },
+        options: baseOptions({ plugins: { legend: { display: false }, pointLabels: { codes: ["SP", "RJ", "DF", "MG", "SC", "RS", "PR", "BA", "AM", "MA", "ES"] }, tooltip: { callbacks: { title: c => c[0].raw.s.state_name, label: c => { const s = c.raw.s; return ["Income R$" + nf.format(s.income_pc) + " per month", "Revenue R$" + s.rev_per_1000.toFixed(1) + " per 1,000 residents", "Late " + s.late_pct.toFixed(1) + "%, " + s.avg_delivery_days.toFixed(1) + " delivery days"]; } } } }, scales: { x: { title: { display: true, text: "Household income per capita, 2018 (R$ per month)", color: css("--ink2") }, grid: { color: css("--grid") }, ticks: { color: css("--ink2") } }, y: { title: { display: true, text: "Revenue per 1,000 residents (R$)", color: css("--ink2") }, beginAtZero: true, grid: { color: css("--grid") }, ticks: { color: css("--ink2") } } } }) })
+    ];
+  }
+};
+
+let current = "overview", charts = [];
+function show(tab) {
+  current = tab;
+  charts.forEach(c => c.destroy());
+  document.querySelectorAll("section[id^=tab-]").forEach(s => s.hidden = s.id !== "tab-" + tab);
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+  charts = builders[tab]();
+}
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => show(current));
+renderStatic();
+show(location.hash.slice(1) in builders ? location.hash.slice(1) : "overview");
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "de_sellers",
+  "position": {
+    "x": 20,
+    "y": 430,
+    "z": 50,
+    "height": 275,
+    "width": 1240,
+    "tabOrder": 50
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "seller_id"
+                }
+              },
+              "queryRef": "seller_watchlist.seller_id",
+              "nativeQueryRef": "seller_id"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "seller_state"
+                }
+              },
+              "queryRef": "seller_watchlist.seller_state",
+              "nativeQueryRef": "seller_state"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "orders"
+                }
+              },
+              "queryRef": "seller_watchlist.orders",
+              "nativeQueryRef": "orders"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "late_orders"
+                }
+              },
+              "queryRef": "seller_watchlist.late_orders",
+              "nativeQueryRef": "late_orders"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "late_pct"
+                }
+              },
+              "queryRef": "seller_watchlist.late_pct",
+              "nativeQueryRef": "late_pct"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "expected_pct"
+                }
+              },
+              "queryRef": "seller_watchlist.expected_pct",
+              "nativeQueryRef": "expected_pct"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "excess_late"
+                }
+              },
+              "queryRef": "seller_watchlist.excess_late",
+              "nativeQueryRef": "excess_late"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "seller_watchlist"
+                    }
+                  },
+                  "Property": "revenue"
+                }
+              },
+              "queryRef": "seller_watchlist.revenue",
+              "nativeQueryRef": "revenue"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "seller_watchlist"
+                  }
+                },
+                "Property": "excess_late"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Sellers worse than their routes explain'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Seller watch-list table'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

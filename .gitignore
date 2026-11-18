@@ -7,3 +7,5 @@ data/staging/*.csv
 data/marts/*.csv
 .env
 dashboard/data/
+dashboard/powerbi/olist_powerbi_data.xlsx
+*.pbix.tmp

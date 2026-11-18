@@ -1,0 +1,44 @@
+createOrReplace
+
+	ref table fact_orders
+
+		measure Revenue = CALCULATE(SUM(fact_order_items[price]), fact_order_items[is_revenue_item] = 1)
+			formatString: #,##0
+
+		measure Orders = CALCULATE(DISTINCTCOUNT(fact_orders[order_id]), fact_orders[is_revenue_order] = 1)
+			formatString: #,##0
+
+		measure Customers = CALCULATE(DISTINCTCOUNT(fact_orders[customer_unique_id]), fact_orders[is_revenue_order] = 1)
+			formatString: #,##0
+
+		measure AOV = DIVIDE([Revenue], [Orders])
+			formatString: #,##0
+
+		measure 'Repeat Customers' = COUNTROWS(FILTER(VALUES(fact_orders[customer_unique_id]), CALCULATE(DISTINCTCOUNT(fact_orders[order_id]), fact_orders[is_revenue_order] = 1) >= 2))
+			formatString: #,##0
+
+		measure 'Repeat Rate' = DIVIDE([Repeat Customers], [Customers])
+			formatString: 0.0%
+
+		measure 'Late Rate' = CALCULATE(AVERAGE(fact_orders[is_late]), fact_orders[is_revenue_order] = 1)
+			formatString: 0.0%
+
+		measure 'Avg Review' = CALCULATE(AVERAGE(fact_orders[review_score]), fact_orders[is_revenue_order] = 1)
+			formatString: 0.00
+
+		measure 'Low Review %' = CALCULATE(AVERAGE(fact_orders[low_review]), fact_orders[is_revenue_order] = 1)
+			formatString: 0.0%
+
+		measure 'Revenue MoM %' = VAR prev = CALCULATE([Revenue], DATEADD(dim_date[date], -1, MONTH)) RETURN DIVIDE([Revenue] - prev, prev)
+			formatString: 0.0%
+
+	ref table rfm_segments
+
+		measure 'Segment Customers' = COUNTROWS(rfm_segments)
+			formatString: #,##0
+
+		measure 'Segment Revenue' = SUM(rfm_segments[monetary])
+			formatString: #,##0
+
+		measure 'Segment Revenue %' = DIVIDE([Segment Revenue], CALCULATE([Segment Revenue], ALL(rfm_segments)))
+			formatString: 0.0%

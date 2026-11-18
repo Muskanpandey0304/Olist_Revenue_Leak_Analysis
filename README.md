@@ -3,7 +3,18 @@
 **Where does a Brazilian online marketplace lose money, and what should it fix first?**
 An end-to-end analysis of about 100,000 Olist orders (2016 to 2018), combined with official IBGE state data, using SQL, Python, statistics and a tested data pipeline, with an Excel workbook and a Power BI dashboard for the business teams.
 
-> **Dashboard:** *(add the published Power BI link here)* &nbsp;|&nbsp; **2-minute walkthrough:** *(add the video link here)*
+> **Live dashboard:** https://muskanpandey0304.github.io/Olist_Revenue_Leak_Analysis/ *(works once GitHub Pages is turned on, see below)* &nbsp;|&nbsp; **Power BI file:** [`dashboard/powerbi/olist_revenue_leak.pbix`](dashboard/powerbi/olist_revenue_leak.pbix) &nbsp;|&nbsp; **2-minute walkthrough:** *(add the video link here)*
+
+<img src="docs/screenshots/overview.png" width="80%">
+
+### Power BI dashboard
+Four pages built in Power BI Desktop on the same star schema (9 tables, 6 relationships, 16 DAX measures). Open [`olist_revenue_leak.pbix`](dashboard/powerbi/olist_revenue_leak.pbix) in Power BI Desktop; the data is inside the file.
+
+| Overview | Customers |
+|---|---|
+| <img src="dashboard/powerbi/page1_overview.png" width="100%"> | <img src="dashboard/powerbi/page2_customers.png" width="100%"> |
+| **Delivery** | **Regions** |
+| <img src="dashboard/powerbi/page3_delivery.png" width="100%"> | <img src="dashboard/powerbi/page4_regions.png" width="100%"> |
 
 ![Monthly revenue](reports/figures/monthly_revenue.png)
 
@@ -61,7 +72,7 @@ raw files  ->  staging (clean, typed, deduplicated)  ->  star schema  ->  analys
 | Regression and decomposition | `notebooks/05`, `notebooks/07` | What causes lateness; where is the regional gap? |
 | Explainable model, time-based validation | `notebooks/06` | Which orders will be late? |
 | Experiment design and power calculation | `notebooks/08` | How would we test a fix? |
-| Excel (live formulas, charts), Power BI | `excel/`, `dashboard/` | How do different teams get the answer? |
+| Excel (live formulas, charts), Power BI (data model, DAX measures, 4 pages), interactive web dashboard | `excel/`, `dashboard/powerbi/`, `docs/` | How do different teams get the answer? |
 
 ## Run it yourself
 Requires Python 3.10 or newer.
@@ -74,6 +85,8 @@ pip install -r requirements.txt
 2. Build everything and run the tests: `python pipeline/run_pipeline.py`
 3. Run an analysis stage, for example `python notebooks/04_late_delivery_tests.py`.
 4. Export for Power BI and Excel: `python pipeline/30_export_for_bi.py` then `python pipeline/31_build_excel.py`.
+5. Rebuild the web dashboard: `python pipeline/32_build_web_dashboard.py` (writes `docs/index.html`).
+6. Rebuild the Power BI file: `python pipeline/33_export_powerbi.py`, then `python pipeline/34_build_powerbi_project.py`. Open the generated `dashboard/powerbi/olist_revenue_leak.pbip` in Power BI Desktop, click **Refresh now**, then **Apply changes**. Details in [`dashboard/POWER_BI_BUILD_GUIDE.md`](dashboard/POWER_BI_BUILD_GUIDE.md).
 
 The raw Olist files and the generated database are not in the repository (size); step 1 and 2 recreate them.
 
@@ -85,7 +98,8 @@ notebooks/   analysis scripts for each stage (statistics, models, scenarios)
 tests/       data quality tests
 reports/     findings per stage, metric definitions, data quality log, memo, report, figures
 excel/       summary workbook
-dashboard/   Power BI build guide and summary tables
+dashboard/   Power BI file and project (powerbi/), web dashboard template, build guide, summary tables
+docs/        the published web dashboard (docs/index.html) and its screenshots
 PROJECT_PLAN.md   the plan, decisions log and change log
 ```
 

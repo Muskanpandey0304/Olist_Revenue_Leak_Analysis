@@ -1,0 +1,1 @@
+expression DataPath = "D:\HEHE\olist-revenue-leak-analysis\dashboard\powerbi\olist_powerbi_data.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]

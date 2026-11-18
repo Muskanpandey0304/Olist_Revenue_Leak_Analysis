@@ -1,0 +1,31 @@
+table dim_product
+
+	column product_id
+		dataType: string
+		sourceColumn: product_id
+		summarizeBy: none
+
+	column category
+		dataType: string
+		sourceColumn: category
+		summarizeBy: none
+
+	column weight_g
+		dataType: double
+		sourceColumn: weight_g
+		summarizeBy: none
+
+	column volume_cm3
+		dataType: double
+		sourceColumn: volume_cm3
+		summarizeBy: none
+
+	partition dim_product = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="dim_product", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"product_id", type text}, {"category", type text}, {"weight_g", type number}, {"volume_cm3", type number}})
+				in
+				    Typed

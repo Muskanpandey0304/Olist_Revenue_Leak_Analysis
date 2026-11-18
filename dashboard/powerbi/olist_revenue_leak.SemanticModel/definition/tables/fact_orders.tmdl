@@ -1,0 +1,141 @@
+table fact_orders
+
+	column order_id
+		dataType: string
+		sourceColumn: order_id
+		summarizeBy: none
+
+	column customer_unique_id
+		dataType: string
+		sourceColumn: customer_unique_id
+		summarizeBy: none
+
+	column customer_state
+		dataType: string
+		sourceColumn: customer_state
+		summarizeBy: none
+
+	column purchase_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		sourceColumn: purchase_date
+		summarizeBy: none
+
+	column order_status
+		dataType: string
+		sourceColumn: order_status
+		summarizeBy: none
+
+	column is_revenue_order
+		dataType: int64
+		sourceColumn: is_revenue_order
+		summarizeBy: none
+
+	column is_late
+		dataType: double
+		sourceColumn: is_late
+		summarizeBy: none
+
+	column delivery_days
+		dataType: double
+		sourceColumn: delivery_days
+		summarizeBy: none
+
+	column estimated_days
+		dataType: int64
+		sourceColumn: estimated_days
+		summarizeBy: none
+
+	column review_score
+		dataType: double
+		sourceColumn: review_score
+		summarizeBy: none
+
+	column items_price
+		dataType: double
+		sourceColumn: items_price
+		summarizeBy: none
+
+	column freight_total
+		dataType: double
+		sourceColumn: freight_total
+		summarizeBy: none
+
+	column avg_distance_km
+		dataType: double
+		sourceColumn: avg_distance_km
+		summarizeBy: none
+
+	column n_items
+		dataType: int64
+		sourceColumn: n_items
+		summarizeBy: none
+
+	column main_payment_type
+		dataType: string
+		sourceColumn: main_payment_type
+		summarizeBy: none
+
+	column delivery_bucket
+		dataType: string
+		sourceColumn: delivery_bucket
+		summarizeBy: none
+
+	column distance_band
+		dataType: string
+		sourceColumn: distance_band
+		summarizeBy: none
+
+	column low_review
+		dataType: double
+		sourceColumn: low_review
+		summarizeBy: none
+
+	measure Revenue = CALCULATE(SUM(fact_order_items[price]), fact_order_items[is_revenue_item] = 1)
+		formatString: \R\$#,##0
+
+	measure Orders = CALCULATE(DISTINCTCOUNT(fact_orders[order_id]), fact_orders[is_revenue_order] = 1)
+		formatString: #,##0
+
+	measure Customers = CALCULATE(DISTINCTCOUNT(fact_orders[customer_unique_id]), fact_orders[is_revenue_order] = 1)
+		formatString: #,##0
+
+	measure AOV = DIVIDE([Revenue], [Orders])
+		formatString: \R\$#,##0
+
+	measure 'Repeat Customers' = COUNTROWS(FILTER(VALUES(fact_orders[customer_unique_id]), CALCULATE(DISTINCTCOUNT(fact_orders[order_id]), fact_orders[is_revenue_order] = 1) >= 2))
+		formatString: #,##0
+
+	measure 'Repeat Rate' = DIVIDE([Repeat Customers], [Customers])
+		formatString: 0.0%
+
+	measure 'Late Rate' = CALCULATE(AVERAGE(fact_orders[is_late]), fact_orders[is_revenue_order] = 1)
+		formatString: 0.0%
+
+	measure 'Avg Review' = CALCULATE(AVERAGE(fact_orders[review_score]), fact_orders[is_revenue_order] = 1)
+		formatString: 0.00
+
+	measure 'Low Review %' = CALCULATE(AVERAGE(fact_orders[low_review]), fact_orders[is_revenue_order] = 1)
+		formatString: 0.0%
+
+	measure 'Revenue MoM %' = VAR prev = CALCULATE([Revenue], DATEADD(dim_date[date], -1, MONTH)) RETURN DIVIDE([Revenue] - prev, prev)
+		formatString: 0.0%
+
+	measure 'Revenue Top 10 Category' = VAR r = RANKX(ALLSELECTED(dim_product[category]), [Revenue], , DESC, DENSE) RETURN IF(r <= 10, [Revenue])
+		formatString: \R\$#,##0
+
+	measure 'Late Rate Known Distance' = CALCULATE([Late Rate], NOT ISBLANK(fact_orders[avg_distance_km]))
+		formatString: 0.0%
+
+	measure 'Late Rate Top 10 States (500+ orders)' = VAR r = RANKX(FILTER(ALLSELECTED(dim_customer[state]), [Orders] >= 500), [Late Rate], , DESC, DENSE) RETURN IF([Orders] >= 500 && r <= 10, [Late Rate])
+		formatString: 0.0%
+
+	partition fact_orders = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataPath), true, true),
+				    Sheet = Source{[Item="fact_orders", Kind="Sheet"]}[Data],
+				    Typed = Table.TransformColumnTypes(Sheet, {{"order_id", type text}, {"customer_unique_id", type text}, {"customer_state", type text}, {"purchase_date", type date}, {"order_status", type text}, {"is_revenue_order", Int64.Type}, {"is_late", type number}, {"delivery_days", type number}, {"estimated_days", Int64.Type}, {"review_score", type number}, {"items_price", type number}, {"freight_total", type number}, {"avg_distance_km", type number}, {"n_items", Int64.Type}, {"main_payment_type", type text}, {"delivery_bucket", type text}, {"distance_band", type text}, {"low_review", type number}})
+				in
+				    Typed

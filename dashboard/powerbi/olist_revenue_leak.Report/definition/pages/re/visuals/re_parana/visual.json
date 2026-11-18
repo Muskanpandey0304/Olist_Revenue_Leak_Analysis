@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "re_parana",
+  "position": {
+    "x": 660,
+    "y": 540,
+    "z": 30,
+    "height": 165,
+    "width": 600,
+    "tabOrder": 30
+  },
+  "visual": {
+    "visualType": "textbox",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Parana is the proposed first test: income above the national level, revenue per resident 42% below Rio de Janeiro.",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#EB6834",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
