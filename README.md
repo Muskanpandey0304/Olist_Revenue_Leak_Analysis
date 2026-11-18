@@ -43,7 +43,7 @@ Leadership says growth has levelled off and asks: which customers matter, why do
 2. **Win back 18,069 high-value one-time customers** with a randomised message (about R$114,500 per extra percentage point of repeat rate).
 3. **Fix delivery where it matters:** investigate the RJ carrier, put 57 sellers on a watch-list, recalibrate the padded delivery estimates (on-time orders arrive a median of 14 days early) and flag the riskiest 10% of orders at purchase.
 
-Experiment designs and sample sizes: [reports/experiment_design.md](reports/experiment_design.md). Full write-up: [reports/insights_report.md](reports/insights_report.md). One-page memo to Operations: [reports/stakeholder_memo.md](reports/stakeholder_memo.md).
+Experiment designs and sample sizes: [reports/experiment_design.md](reports/experiment_design.md). Full write-up: [PDF, 3 pages](reports/insights_report.pdf) ([Markdown](reports/insights_report.md)). One-page memo to Operations: [PDF](reports/stakeholder_memo.pdf) ([Markdown](reports/stakeholder_memo.md)).
 
 ## How it is built
 ```
@@ -87,6 +87,7 @@ pip install -r requirements.txt
 4. Export for Power BI and Excel: `python pipeline/30_export_for_bi.py` then `python pipeline/31_build_excel.py`.
 5. Rebuild the web dashboard: `python pipeline/32_build_web_dashboard.py` (writes `docs/index.html`).
 6. Rebuild the Power BI file: `python pipeline/33_export_powerbi.py`, then `python pipeline/34_build_powerbi_project.py`. Open the generated `dashboard/powerbi/olist_revenue_leak.pbip` in Power BI Desktop, click **Refresh now**, then **Apply changes**. Details in [`dashboard/POWER_BI_BUILD_GUIDE.md`](dashboard/POWER_BI_BUILD_GUIDE.md).
+7. Re-export the memo and report as PDF: `python pipeline/35_export_pdfs.py` (needs Microsoft Edge or Chrome).
 
 The raw Olist files and the generated database are not in the repository (size); step 1 and 2 recreate them.
 
