@@ -5,6 +5,11 @@ An end-to-end analysis of about 100,000 Olist orders (2016 to 2018), combined wi
 
 > **Live dashboard:** https://muskanpandey0304.github.io/Olist_Revenue_Leak_Analysis/ &nbsp;|&nbsp; **Power BI file:** [`dashboard/powerbi/olist_revenue_leak.pbix`](dashboard/powerbi/olist_revenue_leak.pbix)
 
+**The result in 30 seconds**
+- **Only 3.0% of customers ever buy a second time.** Growth has been flat since January 2018, so the business depends on finding new customers every month. 7,311 recent high-value one-time customers (R$2.9M past spend) are the first win-back target.
+- **Late delivery cuts reviews from 4.29 to 2.57 stars, but does not measurably reduce repeat buying** (2.03% vs 2.31%, p = 0.15). About 93% of the extra time is carrier transit, and Rio de Janeiro is the outlier at 13.5% late.
+- **Up to R$1.5M (11.5%) more revenue is possible** if six high-income states reached Rio de Janeiro's sales per resident. This is an upper bound, and Paraná is proposed as the first test.
+
 <img src="docs/screenshots/overview.png" width="80%">
 
 ### Power BI dashboard
@@ -106,3 +111,6 @@ PROJECT_PLAN.md   the plan, decisions log and change log
 
 ## Limits
 Observational data, so no causal claims. The carrier, visit data, margins and commissions are not in the dataset, so costs and break-even points are not estimated. Money figures in the recommendations are scenarios, not forecasts. Customers are identified by `customer_unique_id`; the data ends in August 2018. See section 8 of the [report](reports/insights_report.md).
+
+## License
+MIT, see [LICENSE](LICENSE). The Olist dataset belongs to Olist and is released on Kaggle under its own licence; IBGE figures are public statistics.
